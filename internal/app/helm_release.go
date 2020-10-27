@@ -29,7 +29,7 @@ type helmRelease struct {
 	Chart           string   `json:"Chart"`
 	AppVersion      string   `json:"AppVersion,omitempty"`
 	HelmsmanContext string
-	Values          string `json:"Values"`
+	Values          interface{}
 }
 
 // getHelmReleases fetches a list of all releases in a k8s cluster
