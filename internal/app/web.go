@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -75,6 +76,8 @@ func Serve() {
 
 	log.Info("Preparing plan...")
 	cs := buildState(&s)
+	fmt.Printf("printing context %+v\n", cs)
+
 	p := cs.makePlan(&s)
 	if !flags.keepUntrackedReleases {
 		cs.cleanUntrackedReleases(&s, p)
@@ -90,7 +93,7 @@ func Serve() {
 	// if flags.apply || flags.dryRun || flags.destroy {
 	// 	p.exec()
 	// }
-	setupEndpoints(cs)
+	// setupEndpoints(cs)
 }
 
 func setupEndpoints(cs *currentState) {

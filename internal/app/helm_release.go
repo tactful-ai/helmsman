@@ -29,6 +29,7 @@ type helmRelease struct {
 	Chart           string   `json:"Chart"`
 	AppVersion      string   `json:"AppVersion,omitempty"`
 	HelmsmanContext string
+	Values          string `json:"Values"`
 }
 
 // getHelmReleases fetches a list of all releases in a k8s cluster
@@ -74,6 +75,18 @@ func getHelmReleases(s *state) []helmRelease {
 	}
 	wg.Wait()
 	return allReleases
+}
+
+// getReleaseValues extracts the latest values file for a release
+func (r *helmRelease) getReleaseValues() {
+	cmd := helmCmd([]string{"get", "values", r.Name, "--output", "json", "-n", r.Namespace}, "Getting current values of ["+r.Name+"-"+r.Namespace+" ] namespace...")
+	result := cmd.exec()
+	if result.code != 0 {
+		log.Fatal("Failed to get release value: " + result.errors)
+	}
+	if err := json.Unmarshal([]byte(result.output), &r.Values); err != nil {
+		log.Fatal(fmt.Sprintf("failed to unmarshal Helm CLI output: %s", err))
+	}
 }
 
 func (r *helmRelease) key() string {

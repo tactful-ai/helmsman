@@ -11,3 +11,5 @@ keys/*
 !tests/secrets/keys
 !cmd/**/*
 .helmsman-tmp
+
+deck
