@@ -73,7 +73,16 @@ func Serve() {
 		log.Info("Skipping charts' validation.")
 	}
 
+	log.Info("Loading Image history...")
+	LoadImageVersions("default")
+
+	addImageVersion("default", "api", "v21.3.3")
+	addImageVersion("default", "api", "v21.3.4")
+	addImageVersion("default", "api", "v21.3.5")
+	LoadImageVersions("default")
+
 	log.Info("Preparing plan...")
+
 	cs := buildState(&s)
 
 	p := cs.makePlan(&s)
