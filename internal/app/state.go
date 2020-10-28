@@ -43,6 +43,7 @@ type state struct {
 	GroupMap               map[string]bool
 	TargetApps             map[string]*release
 	TargetNamespaces       map[string]namespace
+	Images                 map[string]*image `yaml:"images"`
 }
 
 // invokes either yaml or toml parser considering file extension

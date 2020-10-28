@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
@@ -76,7 +75,6 @@ func Serve() {
 
 	log.Info("Preparing plan...")
 	cs := buildState(&s)
-	fmt.Printf("printing context %+v\n", cs)
 
 	p := cs.makePlan(&s)
 	if !flags.keepUntrackedReleases {
