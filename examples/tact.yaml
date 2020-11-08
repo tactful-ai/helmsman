@@ -29,7 +29,7 @@ apps:
       version: 2.1.0
 
 # JSON path for image tag in values file
-images:
+imagePaths:
   api: "api.image.tag"
   bot: "bot.image.tag"
   worker: "worker.image.tag"

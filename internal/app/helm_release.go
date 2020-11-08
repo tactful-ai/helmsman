@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/oliveagle/jsonpath"
 )
 
 const (
@@ -30,6 +32,7 @@ type helmRelease struct {
 	AppVersion      string   `json:"AppVersion,omitempty"`
 	HelmsmanContext string
 	Values          interface{}
+	images          []imageVersion
 }
 
 // getHelmReleases fetches a list of all releases in a k8s cluster
@@ -86,6 +89,26 @@ func (r *helmRelease) getReleaseValues() {
 	}
 	if err := json.Unmarshal([]byte(result.output), &r.Values); err != nil {
 		log.Fatal(fmt.Sprintf("failed to unmarshal Helm CLI output: %s", err))
+	}
+}
+
+// oarseImageVersions extracts the image tags defined in the helm chart
+func (r *helmRelease) parseImageVersions(imagePaths map[string]string) {
+	if r.Values == nil {
+		log.Fatal("Values are not loaded yet")
+	}
+
+	for imageName, imagePath := range imagePaths {
+		val, err := jsonpath.JsonPathLookup(r.Values, "$"+imagePath)
+		if err != nil {
+			log.Fatal("failed to find imagepath")
+		} else {
+			v := imageVersion{
+				Name: imageName,
+				Version: fmt.Sprintf("%v", val)
+			}
+			r.images = append(r.images, )
+		}
 	}
 }
 
