@@ -96,20 +96,22 @@ func (r *helmRelease) getReleaseValues() {
 func (r *helmRelease) parseImageVersions(imagePaths map[string]string) {
 	if r.Values == nil {
 		log.Fatal("Values are not loaded yet")
+		return
 	}
 
 	for imageName, imagePath := range imagePaths {
-		val, err := jsonpath.JsonPathLookup(r.Values, "$"+imagePath)
+		val, err := jsonpath.JsonPathLookup(r.Values, "$."+imagePath)
 		if err != nil {
-			log.Fatal("failed to find imagepath")
+			log.Fatal("failed to find imagepath" + imagePath)
 		} else {
 			v := imageVersion{
-				Name: imageName,
-				Version: fmt.Sprintf("%v", val)
+				Name:    imageName,
+				Version: fmt.Sprintf("%v", val),
 			}
-			r.images = append(r.images, )
+			r.images = append(r.images, v)
 		}
 	}
+	fmt.Printf("%+v", r.images)
 }
 
 func (r *helmRelease) key() string {
