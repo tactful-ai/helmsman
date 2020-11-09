@@ -31,8 +31,8 @@ type helmRelease struct {
 	Chart           string   `json:"Chart"`
 	AppVersion      string   `json:"AppVersion,omitempty"`
 	HelmsmanContext string
-	Values          interface{}
 	images          []imageVersion
+	LastError       string
 }
 
 // getHelmReleases fetches a list of all releases in a k8s cluster
@@ -81,26 +81,28 @@ func getHelmReleases(s *state) []helmRelease {
 }
 
 // getReleaseValues extracts the latest values file for a release
-func (r *helmRelease) getReleaseValues() {
+func (r *helmRelease) getReleaseValues() interface{} {
+	var values interface{}
 	cmd := helmCmd([]string{"get", "values", r.Name, "--output", "json", "-n", r.Namespace}, "Getting current values of ["+r.Name+"-"+r.Namespace+" ] namespace...")
 	result := cmd.exec()
 	if result.code != 0 {
 		log.Fatal("Failed to get release value: " + result.errors)
 	}
-	if err := json.Unmarshal([]byte(result.output), &r.Values); err != nil {
+	if err := json.Unmarshal([]byte(result.output), &values); err != nil {
 		log.Fatal(fmt.Sprintf("failed to unmarshal Helm CLI output: %s", err))
 	}
+	return values
 }
 
 // oarseImageVersions extracts the image tags defined in the helm chart
-func (r *helmRelease) parseImageVersions(imagePaths map[string]string) {
-	if r.Values == nil {
+func (r *helmRelease) parseImageVersions(values interface{}, imagePaths map[string]string) {
+	if values == nil {
 		log.Fatal("Values are not loaded yet")
 		return
 	}
 
 	for imageName, imagePath := range imagePaths {
-		val, err := jsonpath.JsonPathLookup(r.Values, "$."+imagePath)
+		val, err := jsonpath.JsonPathLookup(values, "$."+imagePath)
 		if err != nil {
 			log.Fatal("failed to find imagepath" + imagePath)
 		} else {

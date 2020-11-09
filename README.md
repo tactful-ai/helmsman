@@ -1,3 +1,9 @@
+
+Vue based kanban board UI adopted from: 
+https://codesandbox.io/s/animated-draggable-kanban-board-with-tailwind-and-vue-1ry0p
+
+
+
 [![GitHub version](https://d25lcipzij17d.cloudfront.net/badge.svg?id=gh&type=6&v=v3.4.6&x2=0)](https://github.com/Praqma/helmsman/releases) [![CircleCI](https://circleci.com/gh/Praqma/helmsman/tree/master.svg?style=svg)](https://circleci.com/gh/Praqma/helmsman/tree/master)
 
 ![helmsman-logo](docs/images/helmsman.png)

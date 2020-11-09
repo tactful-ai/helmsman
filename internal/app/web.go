@@ -94,7 +94,7 @@ func Serve() {
 	// if flags.apply || flags.dryRun || flags.destroy {
 	// 	p.exec()
 	// }
-	// setupEndpoints(cs)
+	setupEndpoints(cs)
 }
 
 func setupEndpoints(cs *currentState) {
