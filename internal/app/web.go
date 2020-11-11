@@ -100,9 +100,7 @@ func Serve() {
 func setupEndpoints(cs *currentState) {
 	r := gin.Default()
 	r.GET("/releases", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
+		c.JSON(http.StatusOK, cs.releases)
 	})
 	r.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "/releases")
