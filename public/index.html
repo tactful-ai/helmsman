@@ -31,13 +31,21 @@
   <div id="app">
     <div class="flex justify-center">
       <div class="min-h-screen flex overflow-x-scroll py-12">
-        <div v-for="column in columns" :key="column.title"
+        <div v-for="release in releases" :key="release.Name"
           class="bg-gray-100 rounded-lg px-3 py-3 column-width rounded mr-4">
-          <p class="text-gray-700 font-semibold font-sans tracking-wide text-sm">{{column.title}}</p>
+          <p class="text-gray-700 font-semibold font-sans tracking-wide text-md">
+            {{release.Name}} <br/>
+          </p>
+          <p class="text-gray-600 font-semibold font-sans tracking-wide text-sm">
+            Rev: {{release.Revision}} <br/>
+            Updated: {{ (new Date(release.Updated)).toLocaleString() }} <br/>
+          </p>
+
+
           <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-          <draggable :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks">
+          <draggable :list="release.images" :animation="200" ghost-class="ghost-card" group="tasks">
             <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
-            <task-card v-for="(task) in column.tasks" :key="task.id" :task="task" class="mt-3 cursor-move"></task-card>
+            <task-card v-for="(image) in release.images" :key="image.name" :image="image" class="mt-3 cursor-move"></task-card>
             <!-- </transition-group> -->
           </draggable>
         </div>
@@ -46,6 +54,13 @@
   </div>
   <script src="js/card.js"></script>
   <script>
+    Vue.filter('truncate', function (text, length, suffix) {
+      if (text.length > length) {
+          return text.substring(0, length) + suffix;
+      } else {
+          return text;
+      }
+    });
     var app = new Vue({
       el: '#app',
       name: "App",
@@ -53,118 +68,19 @@
       },
       data() {
         return {
-          columns: [{
-              title: "Backlog",
-              tasks: [{
-                  id: 1,
-                  title: "Add discount code to checkout page",
-                  date: "Sep 14",
-                  type: "Feature Request"
-                },
-                {
-                  id: 2,
-                  title: "Provide documentation on integrations",
-                  date: "Sep 12"
-                },
-                {
-                  id: 3,
-                  title: "Design shopping cart dropdown",
-                  date: "Sep 9",
-                  type: "Design"
-                },
-                {
-                  id: 4,
-                  title: "Add discount code to checkout page",
-                  date: "Sep 14",
-                  type: "Feature Request"
-                },
-                {
-                  id: 5,
-                  title: "Test checkout flow",
-                  date: "Sep 15",
-                  type: "QA"
-                }
-              ]
-            },
-            {
-              title: "In Progress",
-              tasks: [{
-                  id: 6,
-                  title: "Design shopping cart dropdown",
-                  date: "Sep 9",
-                  type: "Design"
-                },
-                {
-                  id: 7,
-                  title: "Add discount code to checkout page",
-                  date: "Sep 14",
-                  type: "Feature Request"
-                },
-                {
-                  id: 8,
-                  title: "Provide documentation on integrations",
-                  date: "Sep 12",
-                  type: "Backend"
-                }
-              ]
-            },
-            {
-              title: "Review",
-              tasks: [{
-                  id: 9,
-                  title: "Provide documentation on integrations",
-                  date: "Sep 12"
-                },
-                {
-                  id: 10,
-                  title: "Design shopping cart dropdown",
-                  date: "Sep 9",
-                  type: "Design"
-                },
-                {
-                  id: 11,
-                  title: "Add discount code to checkout page",
-                  date: "Sep 14",
-                  type: "Feature Request"
-                },
-                {
-                  id: 12,
-                  title: "Design shopping cart dropdown",
-                  date: "Sep 9",
-                  type: "Design"
-                },
-                {
-                  id: 13,
-                  title: "Add discount code to checkout page",
-                  date: "Sep 14",
-                  type: "Feature Request"
-                }
-              ]
-            },
-            {
-              title: "Done",
-              tasks: [{
-                  id: 14,
-                  title: "Add discount code to checkout page",
-                  date: "Sep 14",
-                  type: "Feature Request"
-                },
-                {
-                  id: 15,
-                  title: "Design shopping cart dropdown",
-                  date: "Sep 9",
-                  type: "Design"
-                },
-                {
-                  id: 16,
-                  title: "Add discount code to checkout page",
-                  date: "Sep 14",
-                  type: "Feature Request"
-                }
-              ]
-            }
-          ]
+          releases: []
         };
+      },
+      created: async function () {
+        try {
+          const response = await fetch("./releases");
+          const releases = await response.json();
+          console.log("loaded releases..", releases);
+          this.releases.splice(0, this.releases.length, ...releases);
+        }
+        catch (err) {
+          console.error(err);
+        }
       }
     });
 

@@ -79,17 +79,17 @@ func Serve() {
 	log.Info("Preparing plan...")
 	cs := buildState(&s)
 
-	p := cs.makePlan(&s)
-	if !flags.keepUntrackedReleases {
-		cs.cleanUntrackedReleases(&s, p)
-	}
+	// p := cs.makePlan(&s)
+	// if !flags.keepUntrackedReleases {
+	// 	cs.cleanUntrackedReleases(&s, p)
+	// }
 
-	p.sort()
-	p.print()
-	if flags.debug {
-		p.printCmds()
-	}
-	p.sendToSlack()
+	// p.sort()
+	// p.print()
+	// if flags.debug {
+	// 	p.printCmds()
+	// }
+	// p.sendToSlack()
 
 	// if flags.apply || flags.dryRun || flags.destroy {
 	// 	p.exec()
@@ -99,11 +99,16 @@ func Serve() {
 
 func setupEndpoints(cs *currentState) {
 	r := gin.Default()
+
 	r.GET("/releases", func(c *gin.Context) {
-		c.JSON(http.StatusOK, cs.releases)
+		var managedReleases []helmRelease
+		for _, r := range cs.releases {
+			managedReleases = append(managedReleases, r)
+		}
+		c.JSON(http.StatusOK, managedReleases)
 	})
-	r.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusTemporaryRedirect, "/releases")
-	})
+	r.StaticFile("/", "./public/index.html")
+	r.Static("/js", "./public/js")
+
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

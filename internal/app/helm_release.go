@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -31,7 +32,7 @@ type helmRelease struct {
 	Chart           string   `json:"Chart"`
 	AppVersion      string   `json:"AppVersion,omitempty"`
 	HelmsmanContext string
-	images          []imageVersion
+	Images          []imageVersion `json:"images"`
 	LastError       string
 }
 
@@ -96,12 +97,21 @@ func (r *helmRelease) getReleaseValues() interface{} {
 
 // oarseImageVersions extracts the image tags defined in the helm chart
 func (r *helmRelease) parseImageVersions(values interface{}, imagePaths map[string]string) {
+	var imageNames []string
+
 	if values == nil {
 		log.Fatal("Values are not loaded yet")
 		return
 	}
 
-	for imageName, imagePath := range imagePaths {
+	// sort the image paths first
+	for imageName := range imagePaths {
+		imageNames = append(imageNames, imageName)
+	}
+	sort.Strings(imageNames)
+
+	for _, imageName := range imageNames {
+		imagePath := imagePaths[imageName]
 		val, err := jsonpath.JsonPathLookup(values, "$."+imagePath)
 		if err != nil {
 			log.Fatal("failed to find imagepath" + imagePath)
@@ -110,10 +120,10 @@ func (r *helmRelease) parseImageVersions(values interface{}, imagePaths map[stri
 				Name:    imageName,
 				Version: fmt.Sprintf("%v", val),
 			}
-			r.images = append(r.images, v)
+			r.Images = append(r.Images, v)
 		}
 	}
-	fmt.Printf("%+v", r.images)
+	fmt.Printf("%+v", r.Images)
 }
 
 func (r *helmRelease) key() string {
