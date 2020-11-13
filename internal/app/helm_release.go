@@ -114,7 +114,7 @@ func (r *helmRelease) parseImageVersions(values interface{}, imagePaths map[stri
 		imagePath := imagePaths[imageName]
 		val, err := jsonpath.JsonPathLookup(values, "$."+imagePath)
 		if err != nil {
-			log.Fatal("failed to find imagepath" + imagePath)
+			log.Error("failed to find imagepath" + imagePath)
 		} else {
 			v := imageVersion{
 				Name:    imageName,

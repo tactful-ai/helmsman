@@ -43,12 +43,12 @@ func buildState(s *state) *currentState {
 			}()
 
 			if _, found := s.Apps[r.Name]; found {
-				if flags.contextOverride == "" {
-					r.HelmsmanContext = getReleaseContext(r.Name, r.Namespace)
-				} else {
-					r.HelmsmanContext = flags.contextOverride
-					log.Info("Overwrote Helmsman context for release [ " + r.Name + " ] to " + flags.contextOverride)
-				}
+				// if flags.contextOverride == "" {
+				// 	r.HelmsmanContext = getReleaseContext(r.Name, r.Namespace)
+				// } else {
+				// 	r.HelmsmanContext = flags.contextOverride
+				// 	log.Info("Overwrote Helmsman context for release [ " + r.Name + " ] to " + flags.contextOverride)
+				// }
 				values := r.getReleaseValues()
 				r.parseImageVersions(values, s.ImagePaths)
 				cs.releases[r.key()] = r

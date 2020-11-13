@@ -63,15 +63,15 @@ func Serve() {
 		}
 	}
 
-	if !flags.skipValidation {
-		log.Info("Validating charts...")
-		// validate charts-versions exist in defined repos
-		if err := validateReleaseCharts(&s); err != nil {
-			log.Fatal(err.Error())
-		}
-	} else {
-		log.Info("Skipping charts' validation.")
-	}
+	// if !flags.skipValidation {
+	// 	log.Info("Validating charts...")
+	// 	// validate charts-versions exist in defined repos
+	// 	if err := validateReleaseCharts(&s); err != nil {
+	// 		log.Fatal(err.Error())
+	// 	}
+	// } else {
+	// 	log.Info("Skipping charts' validation.")
+	// }
 
 	log.Info("Loading Image history...")
 	LoadImageVersions("default")

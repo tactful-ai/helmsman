@@ -27,6 +27,19 @@ apps:
       enabled: true
       chart: tactful-ai/tactful
       version: 2.1.0
+    
+    demo:
+      namespace: default
+      enabled: true
+      chart: tactful-ai/tactful
+      version: 2.1.0
+
+    beta:
+      namespace: default
+      enabled: true
+      chart: tactful-ai/tactful
+      version: 2.1.0
+
 
 # JSON path for image tag in values file
 imagePaths:

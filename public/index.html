@@ -9,7 +9,9 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
   <!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
   
+
   <style>
     .column-width {
       min-width: 250px;
@@ -23,11 +25,38 @@
       background: #F7FAFC;
       border: 1px solid #4299e1;
     }
+
+    .tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
   </style>
 
 </head>
 
 <body>
+  <h1>Robban</h1>
+  <span>Take the Helm</span>
   <div id="app">
     <div class="flex justify-center">
       <div class="min-h-screen flex overflow-x-scroll py-12">
@@ -38,7 +67,12 @@
           </p>
           <p class="text-gray-600 font-semibold font-sans tracking-wide text-sm">
             Rev: {{release.Revision}} <br/>
-            Updated: {{ (new Date(release.Updated)).toLocaleString() }} <br/>
+            Updated: <span class="tooltip"> 
+              {{ getUpdated(release) }} 
+              <span class="tooltiptext">{{ (new Date(release.Updated)).toLocaleString() }}</span>
+           </span><br/>
+            
+            Chart: {{ release.Chart }} <br/>
           </p>
 
 
@@ -81,7 +115,13 @@
         catch (err) {
           console.error(err);
         }
+      },
+      methods: {
+        getUpdated: function(rel) {
+          return moment(rel.Updated).fromNow();
+        },
       }
+
     });
 
     
