@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/oliveagle/jsonpath"
 )
 
 const (
@@ -29,6 +32,8 @@ type helmRelease struct {
 	Chart           string   `json:"Chart"`
 	AppVersion      string   `json:"AppVersion,omitempty"`
 	HelmsmanContext string
+	Images          []imageVersion `json:"images"`
+	LastError       string
 }
 
 // getHelmReleases fetches a list of all releases in a k8s cluster
@@ -74,6 +79,51 @@ func getHelmReleases(s *state) []helmRelease {
 	}
 	wg.Wait()
 	return allReleases
+}
+
+// getReleaseValues extracts the latest values file for a release
+func (r *helmRelease) getReleaseValues() interface{} {
+	var values interface{}
+	cmd := helmCmd([]string{"get", "values", r.Name, "--output", "json", "-n", r.Namespace}, "Getting current values of ["+r.Name+"-"+r.Namespace+" ] namespace...")
+	result := cmd.exec()
+	if result.code != 0 {
+		log.Fatal("Failed to get release value: " + result.errors)
+	}
+	if err := json.Unmarshal([]byte(result.output), &values); err != nil {
+		log.Fatal(fmt.Sprintf("failed to unmarshal Helm CLI output: %s", err))
+	}
+	return values
+}
+
+// oarseImageVersions extracts the image tags defined in the helm chart
+func (r *helmRelease) parseImageVersions(values interface{}, imagePaths map[string]string) {
+	var imageNames []string
+
+	if values == nil {
+		log.Fatal("Values are not loaded yet")
+		return
+	}
+
+	// sort the image paths first
+	for imageName := range imagePaths {
+		imageNames = append(imageNames, imageName)
+	}
+	sort.Strings(imageNames)
+
+	for _, imageName := range imageNames {
+		imagePath := imagePaths[imageName]
+		val, err := jsonpath.JsonPathLookup(values, "$."+imagePath)
+		if err != nil {
+			log.Error("failed to find imagepath" + imagePath)
+		} else {
+			v := imageVersion{
+				Name:    imageName,
+				Version: fmt.Sprintf("%v", val),
+			}
+			r.Images = append(r.Images, v)
+		}
+	}
+	fmt.Printf("%+v", r.Images)
 }
 
 func (r *helmRelease) key() string {

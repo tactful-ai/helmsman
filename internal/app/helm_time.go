@@ -7,6 +7,7 @@ import (
 )
 
 const ctLayout = "2006-01-02 15:04:05.000000000 -0700 MST"
+const outLayout = "2006-01-02 15:04:05.000000000 -0700"
 const ctLayout2 = "2006-01-02 15:04:05.000000000 -0700 -0700"
 
 var nilTime = (time.Time{}).UnixNano()
@@ -40,7 +41,7 @@ func (ht *HelmTime) MarshalJSON() ([]byte, error) {
 	if ht.Time.UnixNano() == nilTime {
 		return []byte("null"), nil
 	}
-	return []byte(fmt.Sprintf("\"%s\"", ht.Time.Format(ctLayout))), nil
+	return []byte(fmt.Sprintf("\"%s\"", ht.Time.Format(outLayout))), nil
 }
 
 func (ht *HelmTime) IsSet() bool {
