@@ -20,9 +20,9 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/BurntSushi/toml"
-	"github.com/Praqma/helmsman/internal/aws"
-	"github.com/Praqma/helmsman/internal/azure"
-	"github.com/Praqma/helmsman/internal/gcs"
+	"github.com/tactful-ai/robban/internal/aws"
+	"github.com/tactful-ai/robban/internal/azure"
+	"github.com/tactful-ai/robban/internal/gcs"
 )
 
 // printMap prints to the console any map of string keys and values.

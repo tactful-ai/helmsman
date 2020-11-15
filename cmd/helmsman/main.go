@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Praqma/helmsman/internal/app"
+	"github.com/tactful-ai/robban/internal/app"
 )
 
 func main() {

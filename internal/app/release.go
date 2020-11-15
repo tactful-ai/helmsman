@@ -398,7 +398,7 @@ func (r *release) rollback(cs *currentState, p *plan) {
 		p.addDecision("Release [ "+r.Name+" ] is deleted BUT from namespace [ "+rs.Namespace+
 			" ]. Will purge delete it from there and install it in namespace [ "+r.Namespace+" ]", r.Priority, create)
 		p.addDecision("WARNING: rolling back release [ "+r.Name+" ] from [ "+rs.Namespace+" ] to [ "+r.Namespace+
-			" ] might not correctly connect to existing volumes. Check https://github.com/Praqma/helmsman/blob/master/docs/how_to/apps/moving_across_namespaces.md"+
+			" ] might not correctly connect to existing volumes. Check https://github.com/tactful-ai/robban/blob/master/docs/how_to/apps/moving_across_namespaces.md"+
 			" for details if this release uses PV and PVC.", r.Priority, create)
 	}
 }

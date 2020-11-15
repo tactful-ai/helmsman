@@ -40,7 +40,7 @@ COPY --from=helm-installer /usr/local/bin/helm /usr/local/bin/helm
 COPY --from=helm-installer /root/.cache/helm/plugins/ /root/.cache/helm/plugins/
 COPY --from=helm-installer /root/.local/share/helm/plugins/ /root/.local/share/helm/plugins/
 
-WORKDIR /go/src/github.com/Praqma/helmsman
+WORKDIR /go/src/github.com/tactful-ai/robban
 
 COPY . .
 RUN make test \
@@ -64,4 +64,4 @@ COPY --from=helm-installer /usr/local/bin/sops /usr/local/bin/sops
 COPY --from=helm-installer /root/.cache/helm/plugins/ /root/.cache/helm/plugins/
 COPY --from=helm-installer /root/.local/share/helm/plugins/ /root/.local/share/helm/plugins/
 
-COPY --from=builder /go/src/github.com/Praqma/helmsman/helmsman /bin/helmsman
+COPY --from=builder /go/src/github.com/tactful-ai/robban/robban /bin/robban
