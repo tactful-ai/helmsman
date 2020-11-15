@@ -12,3 +12,14 @@ builds:
     goarch:
       - amd64
     main: ./cmd/helmsman/main.go   
+  - binary: robban
+    ldflags: -s -w -X main.build={{.Version}} -extldflags "-static"
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+    main: ./cmd/helmsman/main.go   

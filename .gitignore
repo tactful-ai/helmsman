@@ -6,10 +6,10 @@
 *.world
 *.world1
 helmsman
-helmsman.exe
+robban.exe
 keys/*
 !tests/secrets/keys
 !cmd/**/*
 .helmsman-tmp
-
+.tmp
 deck

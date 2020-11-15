@@ -57,7 +57,7 @@ update-deps: ## Update depdendencies. Runs `go get -u` internally.
 	@GOFLAGS="" go mod vendor
 
 build: deps vet ## Build the package
-	@go build -o deck -ldflags '-X main.version="${TAG}-${DATE}" -extldflags "-static"' cmd/deck/main.go
+	@go build -o robban -ldflags '-X main.version="${TAG}-${DATE}" -extldflags "-static"' cmd/robban/main.go
 
 generate:
 	@go generate #${PKGS}
