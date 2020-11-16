@@ -64,4 +64,5 @@ COPY --from=helm-installer /usr/local/bin/sops /usr/local/bin/sops
 COPY --from=helm-installer /root/.cache/helm/plugins/ /root/.cache/helm/plugins/
 COPY --from=helm-installer /root/.local/share/helm/plugins/ /root/.local/share/helm/plugins/
 
+COPY --from=builder /go/src/github.com/tactful-ai/robban/public/ /bin/public/
 COPY --from=builder /go/src/github.com/tactful-ai/robban/robban /bin/robban
