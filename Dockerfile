@@ -4,8 +4,9 @@ ARG GLOBAL_KUBE_VERSION="v1.19.0"
 ARG GLOBAL_HELM_VERSION="v3.3.4"
 ARG GLOBAL_HELM_DIFF_VERSION="v3.1.3"
 
-### Helm Installer ###
-FROM alpine:${ALPINE_VERSION} as helm-installer
+### Go Builder & Tester ###
+FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} as builder
+
 ARG GLOBAL_KUBE_VERSION
 ARG GLOBAL_HELM_VERSION
 ARG GLOBAL_HELM_DIFF_VERSION
@@ -28,23 +29,14 @@ RUN helm plugin install https://github.com/databus23/helm-diff --version ${HELM_
 RUN helm plugin install https://github.com/futuresimple/helm-secrets
 RUN rm -r /tmp/helm-diff /tmp/helm-diff.tgz
 
-### Go Builder & Tester ###
-FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} as builder
-
-RUN apk add --update --no-cache ca-certificates git openssh ruby bash make
 RUN gem install hiera-eyaml --no-doc
 RUN update-ca-certificates
-
-COPY --from=helm-installer /usr/local/bin/kubectl /usr/local/bin/kubectl
-COPY --from=helm-installer /usr/local/bin/helm /usr/local/bin/helm
-COPY --from=helm-installer /root/.cache/helm/plugins/ /root/.cache/helm/plugins/
-COPY --from=helm-installer /root/.local/share/helm/plugins/ /root/.local/share/helm/plugins/
 
 WORKDIR /go/src/github.com/tactful-ai/robban
 
 COPY . .
-RUN make test \
-    && LastTag=$(git describe --abbrev=0 --tags) \
+# RUN make test
+RUN LastTag=$(git describe --abbrev=0 --tags) \
     && TAG=$LastTag-$(date +"%d%m%y") \
     && LT_SHA=$(git rev-parse ${LastTag}^{}) \
     && LC_SHA=$(git rev-parse HEAD) \
@@ -58,11 +50,11 @@ RUN apk add --update --no-cache ca-certificates git openssh ruby curl bash gnupg
 RUN gem install hiera-eyaml --no-doc
 RUN update-ca-certificates
 
-COPY --from=helm-installer /usr/local/bin/kubectl /usr/local/bin/kubectl
-COPY --from=helm-installer /usr/local/bin/helm /usr/local/bin/helm
-COPY --from=helm-installer /usr/local/bin/sops /usr/local/bin/sops
-COPY --from=helm-installer /root/.cache/helm/plugins/ /root/.cache/helm/plugins/
-COPY --from=helm-installer /root/.local/share/helm/plugins/ /root/.local/share/helm/plugins/
+COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/kubectl
+COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
+COPY --from=builder /usr/local/bin/sops /usr/local/bin/sops
+COPY --from=builder /root/.cache/helm/plugins/ /root/.cache/helm/plugins/
+COPY --from=builder /root/.local/share/helm/plugins/ /root/.local/share/helm/plugins/
 
 COPY --from=builder /go/src/github.com/tactful-ai/robban/public/ /bin/public/
 COPY --from=builder /go/src/github.com/tactful-ai/robban/robban /bin/robban
