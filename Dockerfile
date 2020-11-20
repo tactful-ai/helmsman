@@ -56,5 +56,9 @@ COPY --from=builder /usr/local/bin/sops /usr/local/bin/sops
 COPY --from=builder /root/.cache/helm/plugins/ /root/.cache/helm/plugins/
 COPY --from=builder /root/.local/share/helm/plugins/ /root/.local/share/helm/plugins/
 
-COPY --from=builder /go/src/github.com/tactful-ai/robban/public/ /bin/public/
-COPY --from=builder /go/src/github.com/tactful-ai/robban/robban /bin/robban
+WORKDIR /opt
+COPY --from=builder /go/src/github.com/tactful-ai/robban/public/ /opt/public/
+COPY --from=builder /go/src/github.com/tactful-ai/robban/robban /opt/robban
+
+EXPOSE 8080
+ENTRYPOINT [ "robban" ]

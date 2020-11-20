@@ -39,11 +39,12 @@ type state struct {
 	PreconfiguredHelmRepos []string             `yaml:"preconfiguredHelmRepos"`
 	Apps                   map[string]*release  `yaml:"apps"`
 	AppsTemplates          map[string]*release  `yaml:"appsTemplates,omitempty"`
+	Releases               []*release           `yaml:"releases"`
 	TargetMap              map[string]bool
 	GroupMap               map[string]bool
 	TargetApps             map[string]*release
 	TargetNamespaces       map[string]namespace
-	ImagePaths             map[string]string `yaml:"imagePaths"`
+	Images                 []*imageLookup `yaml:"images"`
 }
 
 // invokes either yaml or toml parser considering file extension

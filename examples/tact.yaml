@@ -8,45 +8,34 @@ namespaces:
   default:
     protected: false
   
-apps:
-    alpha:
+releases:
+    - name: alpha
       namespace: default
-      enabled: true
-      chart: tactful-ai/tactful
-      version: 2.1.0
 
-    # demo:
-    #   namespace: default
-    #   enabled: true
-    #   chart: tactful-ai/tactful
-    #   version: 2.1.0
-  
-
-    test:
+    - name: test
       namespace: default
-      enabled: true
-      chart: tactful-ai/tactful
-      version: 2.1.0
     
-    demo:
+    - name: demo
       namespace: default
-      enabled: true
-      chart: tactful-ai/tactful
-      version: 2.1.0
 
-    beta:
+    - name: beta
       namespace: default
-      enabled: true
-      chart: tactful-ai/tactful
-      version: 2.1.0
 
 
-# JSON path for image tag in values file
-imagePaths:
-  api: "api.image.tag"
-  bot: "bot.image.tag"
-  worker: "worker.image.tag"
-  flower: "flower.image.tag"
-  notebook: "notebook.image.tag"
-  nlu: "nlu.image.tag"
-  vdash: "vdash.image.tag"
+# defines all the images managed by the Helm chart
+# and the JSON-Path for each image tag in the values file
+images:
+  - name: api
+    path: "api.image.tag"
+  - name: bot
+    path: "bot.image.tag"
+  - name: worker
+    path: "worker.image.tag"
+  - name: flower
+    path: "flower.image.tag"
+  - name: notebook
+    path: "notebook.image.tag"
+  - name: nlu
+    path: "nlu.image.tag"
+  - name: vdash
+    path: "vdash.image.tag"

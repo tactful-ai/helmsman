@@ -7,15 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var stop = make(chan bool)
+
 // Serve website and API
 func Serve() {
 	var s state
-
+	var cs currentState
+	cs.isReady = false
 	// delete temp files with substituted env vars when the program terminates
 	defer os.RemoveAll(tempFilesDir)
 	if !flags.noCleanup {
 		defer s.cleanup()
 	}
+
+	setupEndpoints(&cs)
 
 	flags.readState(&s)
 	if len(s.GroupMap) > 0 {
@@ -77,7 +82,7 @@ func Serve() {
 	LoadImageVersions("default")
 
 	log.Info("Preparing plan...")
-	cs := buildState(&s)
+	buildState(&s, &cs)
 
 	// p := cs.makePlan(&s)
 	// if !flags.keepUntrackedReleases {
@@ -94,21 +99,33 @@ func Serve() {
 	// if flags.apply || flags.dryRun || flags.destroy {
 	// 	p.exec()
 	// }
-	setupEndpoints(cs)
+	<-stop
+
 }
 
 func setupEndpoints(cs *currentState) {
 	r := gin.Default()
 
-	r.GET("/releases", func(c *gin.Context) {
-		var managedReleases []helmRelease
-		for _, r := range cs.releases {
-			managedReleases = append(managedReleases, r)
-		}
-		c.JSON(http.StatusOK, managedReleases)
+	r.GET("/status", func(c *gin.Context) {
+
+		c.JSON(http.StatusOK, gin.H{
+			"isReady":  cs.isReady,
+			"releases": cs.releases,
+		})
 	})
 	r.StaticFile("/", "./public/index.html")
 	r.Static("/js", "./public/js")
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
+	}
+
+	// Initializing the server in a goroutine so that it wont block
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+		stop <- true
+	}()
 }

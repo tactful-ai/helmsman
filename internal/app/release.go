@@ -381,7 +381,7 @@ func (r *release) reInstall(p *plan, optionalOldNamespace ...string) {
 // if the release is already deleted but from a different namespace than the one specified in input,
 // it purge deletes it and create it in the specified namespace.
 func (r *release) rollback(cs *currentState, p *plan) {
-	rs, ok := cs.releases[r.key()]
+	rs, ok := cs.findRelease(r.key())
 	if !ok {
 		return
 	}

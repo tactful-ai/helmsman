@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -96,28 +95,19 @@ func (r *helmRelease) getReleaseValues() interface{} {
 }
 
 // oarseImageVersions extracts the image tags defined in the helm chart
-func (r *helmRelease) parseImageVersions(values interface{}, imagePaths map[string]string) {
-	var imageNames []string
-
+func (r *helmRelease) parseImageVersions(values interface{}, images []*imageLookup) {
 	if values == nil {
 		log.Fatal("Values are not loaded yet")
 		return
 	}
 
-	// sort the image paths first
-	for imageName := range imagePaths {
-		imageNames = append(imageNames, imageName)
-	}
-	sort.Strings(imageNames)
-
-	for _, imageName := range imageNames {
-		imagePath := imagePaths[imageName]
-		val, err := jsonpath.JsonPathLookup(values, "$."+imagePath)
+	for _, image := range images {
+		val, err := jsonpath.JsonPathLookup(values, "$."+image.Path)
 		if err != nil {
-			log.Error("failed to find imagepath" + imagePath)
+			log.Error("failed to find imagepath" + image.Path)
 		} else {
 			v := imageVersion{
-				Name:    imageName,
+				Name:    image.Name,
 				Version: fmt.Sprintf("%v", val),
 			}
 			r.Images = append(r.Images, v)

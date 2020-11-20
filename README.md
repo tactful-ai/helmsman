@@ -36,6 +36,9 @@ Check the images on [dockerhub](https://hub.docker.com/r/tactful/robban)
 
 ```bash
 docker pull tactful/robban
+docker run -it -v /path/to/config/dir:/opt/config -p 8080:8080 robban -f config/myconfig.yaml
+
+
 ```
 
 # Documentation
@@ -59,3 +62,8 @@ Robban can be used in three different settings:
 # Contributing
 
 Pull requests, feedback/feature requests are welcome. Please check our [contribution guide](CONTRIBUTION.md).
+
+# UI Credits
+
+Vue based kanban board UI adopted from: 
+https://codesandbox.io/s/animated-draggable-kanban-board-with-tailwind-and-vue-1ry0p

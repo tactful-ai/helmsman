@@ -55,11 +55,17 @@
 </head>
 
 <body>
-  <h1>Robban</h1>
-  <span>Take the Helm</span>
+  <!-- <h1>Robban</h1>
+  <span>Take the Helm</span> -->
   <div id="app">
     <div class="flex justify-center">
-      <div class="min-h-screen flex overflow-x-scroll py-12">
+      <div v-if="!isReady" class="min-h-screen flex overflow-x-scroll py-12">
+        Loading Releases, please wait ...
+      </div>
+
+
+      <div v-if="isReady" class="min-h-screen flex overflow-x-scroll py-12">
+
         <div v-for="release in releases" :key="release.Name"
           class="bg-gray-100 rounded-lg px-3 py-3 column-width rounded mr-4">
           <p class="text-gray-700 font-semibold font-sans tracking-wide text-md">
@@ -102,24 +108,38 @@
       },
       data() {
         return {
-          releases: []
+          releases: [],
+          isReady: false,
+
         };
       },
       created: async function () {
-        try {
-          const response = await fetch("./releases");
-          const releases = await response.json();
-          console.log("loaded releases..", releases);
-          this.releases.splice(0, this.releases.length, ...releases);
-        }
-        catch (err) {
-          console.error(err);
-        }
+        setInterval(this.fetchStatus, 1000*60);
       },
       methods: {
         getUpdated: function(rel) {
           return moment(rel.Updated).fromNow();
         },
+        async fetchStatus() {
+          try {
+            const response = await fetch("./status");
+            await Vue.nextTick();
+            const state = await response.json();
+            const releases = state.releases;
+            this.isReady = state.isReady;
+            console.log("loaded state..", state);
+            if (releases != null && releases.length > 0) {
+              this.releases.splice(0, this.releases.length, ...releases);
+            }
+            else {
+              
+            }
+        }
+        catch (err) {
+          console.error(err);
+        }
+
+        }
       }
 
     });

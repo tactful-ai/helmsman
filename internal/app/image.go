@@ -18,6 +18,12 @@ var (
 	images = make(map[string][]imageVersion)
 )
 
+// Defines an image name and its json-path in a helm values file
+type imageLookup struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+}
+
 type imageVersion struct {
 	Name      string    `json:"name"`
 	CreatedOn time.Time `json:"createdOn"`

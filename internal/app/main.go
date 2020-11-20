@@ -26,6 +26,7 @@ func init() {
 // Main is the app main function
 func Main() {
 	var s state
+	var cs currentState
 
 	// delete temp files with substituted env vars when the program terminates
 	defer os.RemoveAll(tempFilesDir)
@@ -99,7 +100,8 @@ func Main() {
 	}
 
 	log.Info("Preparing plan...")
-	cs := buildState(&s)
+
+	buildState(&s, &cs)
 	p := cs.makePlan(&s)
 	if !flags.keepUntrackedReleases {
 		cs.cleanUntrackedReleases(&s, p)

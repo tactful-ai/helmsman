@@ -9,21 +9,15 @@ import (
 
 type currentState struct {
 	sync.Mutex
-	releases map[string]helmRelease
+	releases []helmRelease
 	plan     *plan
-}
-
-func newCurrentState() *currentState {
-	return &currentState{
-		releases: map[string]helmRelease{},
-	}
+	isReady  bool
 }
 
 // buildState builds the currentState map containing information about all releases existing in a k8s cluster
-func buildState(s *state) *currentState {
+func buildState(s *state, cs *currentState) {
 	log.Info("Acquiring current Helm state from cluster...")
 
-	cs := newCurrentState()
 	rel := getHelmReleases(s)
 
 	wg := sync.WaitGroup{}
@@ -42,21 +36,19 @@ func buildState(s *state) *currentState {
 				<-sem
 			}()
 
-			if _, found := s.Apps[r.Name]; found {
-				// if flags.contextOverride == "" {
-				// 	r.HelmsmanContext = getReleaseContext(r.Name, r.Namespace)
-				// } else {
-				// 	r.HelmsmanContext = flags.contextOverride
-				// 	log.Info("Overwrote Helmsman context for release [ " + r.Name + " ] to " + flags.contextOverride)
-				// }
-				values := r.getReleaseValues()
-				r.parseImageVersions(values, s.ImagePaths)
-				cs.releases[r.key()] = r
+			// process only if it is a mentiored release
+			for _, monitoredRel := range s.Releases {
+
+				if monitoredRel.key() == r.key() {
+					values := r.getReleaseValues()
+					r.parseImageVersions(values, s.Images)
+					cs.releases = append(cs.releases, r)
+				}
 			}
 		}(r)
 	}
 	wg.Wait()
-	return cs
+	cs.isReady = true
 }
 
 // makePlan creates a plan of the actions needed to make the desired state come true.
@@ -241,7 +233,7 @@ func (cs *currentState) decide(r *release, s *state, p *plan, chartName, chartVe
 		os.Exit(1)
 	} else {
 		// If there is no release in the cluster with this name and in this namespace, then install it!
-		if _, ok := cs.releases[r.key()]; !ok {
+		if ok := cs.releaseExists(r, ""); !ok {
 			p.addDecision("Release [ "+r.Name+" ] version [ "+r.Version+" ] will be installed in [ "+r.Namespace+" ] namespace", r.Priority, create)
 			r.install(p)
 		} else {
@@ -257,15 +249,37 @@ func (cs *currentState) decide(r *release, s *state, p *plan, chartName, chartVe
 // The key format for releases uniqueness is:  <release name - release namespace>
 // If status is provided as an input [deployed, deleted, failed], then the search will verify the release status matches the search status.
 func (cs *currentState) releaseExists(r *release, status string) bool {
-	v, ok := cs.releases[r.key()]
-	if !ok || v.HelmsmanContext != curContext {
+	ok := false
+	var rel *helmRelease
+	for _, v := range cs.releases {
+		if v.key() == r.key() {
+			rel = &v
+			ok = true
+		}
+	}
+
+	if !ok || rel.HelmsmanContext != curContext {
 		return false
 	}
 
 	if status != "" {
-		return v.Status == status
+		return rel.Status == status
 	}
 	return true
+}
+
+// The key format for releases uniqueness is:  <release name - release namespace>
+func (cs *currentState) findRelease(key string) (*helmRelease, bool) {
+	ok := false
+	var rel *helmRelease
+	for _, v := range cs.releases {
+		if v.key() == key {
+			rel = &v
+			ok = true
+		}
+	}
+
+	return rel, ok
 }
 
 var resourceNameExtractor = regexp.MustCompile(`(^\w+\/|\.v\d+$)`)
@@ -368,7 +382,7 @@ func (cs *currentState) cleanUntrackedReleases(s *state, p *plan) {
 		for name, tracked := range hr {
 			if !tracked {
 				toDelete++
-				r := cs.releases[name+"-"+ns]
+				r, _ := cs.findRelease(name + "-" + ns)
 				p.addDecision("Untracked release [ "+r.Name+" ] found and it will be deleted", -1000, delete)
 				r.uninstall(p)
 			}
@@ -391,7 +405,7 @@ func (cs *currentState) inspectUpgradeScenario(r *release, p *plan, chartName, c
 		return
 	}
 
-	rs, ok := cs.releases[r.key()]
+	rs, ok := cs.findRelease(r.key())
 	if !ok {
 		return
 	}
