@@ -4,7 +4,9 @@
 
 # What is Robban?
 
-**Robban** means **Ship Captain** in Arabic. Robban helps you manage individual deployments in your Helm releases. It makes managing distibuted deployments a breeze.
+Visual Web UI to monitor multiple helm releases and to promote images accross them.
+
+**Robban** means **Ship Captain** in Arabic.
 
 # How does it work?
 
@@ -16,7 +18,7 @@ You can also promote images accross release as you prefer using simple drag&drop
 
 # Based on helmsman
 
-Robban is forked and is based on helmsman. and when it promotes an image it utilizes helmsman plans.
+Robban is forked from helmsman. and when it promotes an image it utilizes helmsman plans.
 
 # Install
 
@@ -35,8 +37,7 @@ If you use private helm repos, you will need either `helm-gcs` or `helm-s3` plug
 Check the images on [dockerhub](https://hub.docker.com/r/tactful/robban)
 
 ```bash
-docker pull tactful/robban
-docker run -it -v /path/to/config/dir:/opt/config -p 8080:8080 robban -f config/myconfig.yaml
+docker run -it -v /path/to/config/dir:/opt/config -p 8080:8080 tactful/robban -f config/myconfig.yaml
 
 
 ```

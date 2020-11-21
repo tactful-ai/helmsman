@@ -56,4 +56,4 @@ COPY --from=builder /go/src/github.com/tactful-ai/robban/public/ /opt/public/
 COPY --from=builder /go/src/github.com/tactful-ai/robban/robban /opt/robban
 
 EXPOSE 8080
-ENTRYPOINT [ "robban" ]
+ENTRYPOINT [ "/opt/robban" ]
