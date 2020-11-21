@@ -36,12 +36,7 @@ WORKDIR /go/src/github.com/tactful-ai/robban
 
 COPY . .
 # RUN make test
-RUN LastTag=$(git describe --abbrev=0 --tags) \
-    && TAG=$LastTag-$(date +"%d%m%y") \
-    && LT_SHA=$(git rev-parse ${LastTag}^{}) \
-    && LC_SHA=$(git rev-parse HEAD) \
-    && if [ ${LT_SHA} != ${LC_SHA} ]; then TAG=latest-$(date +"%d%m%y"); fi \
-    && make build
+RUN make build
 
 ### Final Image ###
 FROM alpine:${ALPINE_VERSION} as base
