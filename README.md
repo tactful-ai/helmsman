@@ -10,7 +10,7 @@ Visual Web UI to monitor multiple helm releases and to promote images accross th
 
 # How does it work?
 
-Robban uses a simple declarative YAML file to allow you to describe the Helm releases you manage and the application images inside them [example yaml file](https://github.com/Praqma/helmsman/blob/master/examples/example.yaml).
+Robban uses a simple declarative YAML file to allow you to describe the Helm releases you manage and the application images inside them [example yaml file](examples/example.yaml).
 
 Robban scans your cluster for helm releases and using JSONPath it disects the images that are deployed there. then it draws a kanban board allowing you to visually see what is deployed where.
 
@@ -37,9 +37,9 @@ If you use private helm repos, you will need either `helm-gcs` or `helm-s3` plug
 Check the images on [dockerhub](https://hub.docker.com/r/tactful/robban)
 
 ```bash
-docker run -it -v /path/to/config/dir:/opt/config -p 8080:8080 tactful/robban -f config/myconfig.yaml
-
-
+docker run -v /path/to/config/dir:/opt/config \
+    -p 8080:8080 tactful/robban \
+    -f config/myconfig.yaml
 ```
 
 # Documentation
@@ -60,7 +60,9 @@ Robban can be used in three different settings:
 - [As a docker image inside a k8s cluster](https://github.com/Praqma/helmsman/blob/master/docs/how_to/deployments/inside_k8s.md)
 
 
-# Contributing
+# Roadmap and Contributing
+
+These are the proposed features planned for the next version [V1 Project](https://github.com/tactful-ai/robban/projects/1). If you are interested in contributing please leave a comment on the issue you can help with.
 
 Pull requests, feedback/feature requests are welcome. Please check our [contribution guide](CONTRIBUTION.md).
 

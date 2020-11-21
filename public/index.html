@@ -114,7 +114,8 @@
         };
       },
       created: async function () {
-        setInterval(this.fetchStatus, 1000*60);
+        await this.fetchStatus();
+        setInterval(this.fetchStatus, 1000*30);
       },
       methods: {
         getUpdated: function(rel) {

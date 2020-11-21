@@ -15,7 +15,13 @@ const (
 )
 
 var (
-	images = make(map[string][]imageVersion)
+	images            = make(map[string][]imageVersion)
+	defaultImagePaths = []string{
+		"*.tag",
+		"*.repository",
+		"*.image",
+		"*.imageTag",
+	}
 )
 
 // Defines an image name and its json-path in a helm values file
