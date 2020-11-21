@@ -78,7 +78,7 @@ func Test_getValuesFiles(t *testing.T) {
 func Test_inspectUpgradeScenario(t *testing.T) {
 	type args struct {
 		r *release
-		s *map[string]helmRelease
+		s *[]helmRelease
 	}
 	tests := []struct {
 		name string
@@ -95,8 +95,9 @@ func Test_inspectUpgradeScenario(t *testing.T) {
 					Chart:     "./../../tests/chart-test",
 					Enabled:   true,
 				},
-				s: &map[string]helmRelease{
-					"release1-namespace": {
+				s: &[]helmRelease{
+					{
+						Name:      "release1-namespace",
 						Namespace: "namespace",
 						Chart:     "chart-1.0.0",
 					},
@@ -205,7 +206,7 @@ func Test_decide(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cs := newCurrentState()
+			var cs currentState
 			tt.args.s.TargetMap = make(map[string]bool)
 
 			for _, target := range tt.targetFlag {
